@@ -1,0 +1,58 @@
+project_name: autopip
+version: 2
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: linux-amd64
+    main: .
+    goos:
+      - linux
+    goarch:
+      - amd64
+    env:
+      - CGO_ENABLED=0
+    ldflags:
+      - -s -w -X main.Version={{.Version}}
+
+  - id: linux-arm64
+    main: .
+    goos:
+      - linux
+    goarch:
+      - arm64
+    env:
+      - CGO_ENABLED=0
+    ldflags:
+      - -s -w -X main.Version={{.Version}}
+
+  - id: android-arm64
+    main: .
+    goos:
+      - android
+    goarch:
+      - arm64
+    env:
+      - CGO_ENABLED=0
+    ldflags:
+      - -s -w -X main.Version={{.Version}}
+
+archives:
+  - format: tar.gz
+    name_template: >-
+      {{ .ProjectName }}-{{ .Version }}-
+      {{- if eq .Os "android" }}android
+      {{- else }}{{ .Os }}{{ end }}-
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else }}{{ .Arch }}{{ end }}
+
+checksum:
+  name_template: "checksums.txt"
+  algorithm: sha256
+
+release:
+  github:
+    owner: FarizzDev
+    name: autopip
